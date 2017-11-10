@@ -20,6 +20,7 @@ pmmn.cgi is CGI wrapper for pmmn. It aims to monitor web servers which can not u
   - Put pmmnc\_ at munin lib/plugins directory.
   - Make symlink to munin etc/plugins directory. For example, ln -s /path/to/munin/lib/plugins/pmmnc\_ pmmnc\_hostname.
   - Set environment variable env.pmmn\_uri if nesessary.
+  - pmmnc\_ behaves like a multi-graph plugin. 
 
 # Lisence
 
