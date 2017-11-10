@@ -1,0 +1,120 @@
+#!/bin/bash
+
+: << =cut
+
+=head1 NAME
+
+  pmmnc_ - Munin plugin to fetch values via pmmn cgi wrapper
+
+=head1 CONFIGURATION
+
+  Make symlink:
+    cd /path/to/munin/etc/plugins
+    ln -s /path/to/munin/lib/plugins/pmmnc_ pmmnc_hostname
+
+=head1 ENVIRONMENT VARIABLES
+
+  env.pmmn_uri - path to pmmn.cgi
+    example: http://www.example.com/cgi-bin/pmmn.cgi
+    default: http://${host_name}/cgi-bin/pmmn.cgi 
+
+  env.curl_opts - curl options
+    example: --user USER:PASS --proxy http://proxy:3128
+    default: none
+
+=head1 AUTHOR
+
+  K.Cima https://github.com/shakemid
+
+=head1 LICENSE
+
+  GPLv2
+
+=head1 Magic markers
+
+  #%# family=contrib
+  #%# capabilities=autoconf
+
+=cut
+
+# Include plugin.sh
+. "${MUNIN_LIBDIR:-}/plugins/plugin.sh"
+is_multigraph "$@"
+
+# Shell options
+set -o nounset
+
+# Global variables
+plugin_name=${0##*/}
+host_name=${plugin_name#*_}
+pmmn_uri=${pmmn_uri:-http://${host_name}/cgi-bin/pmmn.cgi}
+curl_opts=${curl_opts:-}
+
+# Functions
+
+do_list() {
+    curl ${curl_opts} -s -XPOST -d "list" "$pmmn_uri"
+}
+
+do_config() {
+    local func="$1"
+
+    echo "multigraph ${plugin_name}_${func}"
+    curl ${curl_opts} -s -XPOST -d "config $func" "$pmmn_uri"
+    echo
+}
+
+do_fetch() {
+    local func="$1"
+
+    echo "multigraph ${plugin_name}_${func}"
+    curl ${curl_opts} -s -XPOST -d "fetch $func" "$pmmn_uri"
+    echo
+}
+
+autoconf() {
+    echo "no"
+}
+
+config() {
+    local func
+
+    echo "host_name ${host_name}"
+    echo
+
+    for func in $functions
+    do
+        do_config "$func"
+    done
+}
+
+fetch() {
+    local func
+
+    echo "host_name ${host_name}"
+    echo
+
+    for func in $functions
+    do
+        do_fetch "$func"
+    done
+}
+
+# Main
+
+functions=$( do_list )
+
+case ${1:-} in
+autoconf)
+    autoconf
+    ;;
+config)
+    config
+    [ "${MUNIN_CAP_DIRTYCONFIG:-}" = "1" ] && fetch
+    ;;
+*)
+    fetch
+    ;;
+esac
+
+exit 0
