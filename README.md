@@ -5,6 +5,7 @@ A Poor Man's Munin Node CGI Wrapper
 
 A Poor Man's Munin Node (pmmn) is a lite alternative implementation of munin-node. It designed to work with Perl core modules and inetd/xinetd. It would be useful especially for old or restricted environment.
 - [A Poor Man's Munin Node](https://github.com/munin-monitoring/contrib/tree/master/tools/pmmn)
+- [A Poor Man's Munin Node to Monitor "Hostile" UNIX Servers](http://blog.pwkf.org/post/2008/11/04/A-Poor-Man-s-Munin-Node-to-Monitor-Hostile-UNIX-Servers)
 
 pmmn.cgi is CGI wrapper for pmmn. It aims to monitor web servers which can not use inetd/xinetd but can execute pmmn, for example, shared web hosting services.
 
